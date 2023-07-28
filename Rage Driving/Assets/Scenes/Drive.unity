@@ -354,6 +354,8 @@ MonoBehaviour:
   speed: 10
   rotationSpeed: 100
   honkSound: {fileID: 8300000, guid: 10f67ddcdaeb1b744ad7895db2e33780, type: 3}
+  deathZone: -10
+  startingPosition: {x: 0, y: 0.5, z: 2.5}
 --- !u!54 &505407252
 Rigidbody:
   m_ObjectHideFlags: 0

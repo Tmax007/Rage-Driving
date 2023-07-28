@@ -14,6 +14,9 @@ public class CarController : MonoBehaviour
     private float horizontalInput;     
     private float verticalInput;
 
+    public float deathZone = -10f; 
+    public Vector3 startingPosition;
+
     private AudioSource audioSource;
 
     private void Awake()
@@ -31,6 +34,12 @@ public class CarController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             Honk();
+        }
+
+        // Check if the car falls below the Y-coordinate threshold
+        if (transform.position.y < deathZone)
+        {
+            RespawnCar();
         }
     }
 
@@ -69,5 +78,14 @@ public class CarController : MonoBehaviour
             audioSource.PlayOneShot(honkSound);
         }
     }
+
+    private void RespawnCar()
+    {
+        // Reset the car's position and rotation to the starting position
+        transform.position = startingPosition;
+        transform.rotation = Quaternion.identity;
+        
+    }
 }
+
 
