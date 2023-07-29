@@ -650,6 +650,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 363e5ff40ab94bf458ea474e3248972e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minigame: {fileID: 1141938834}
+  phoneBackground: {fileID: 0}
   gameOnScreen: 0
 --- !u!1 &705055230
 GameObject:
