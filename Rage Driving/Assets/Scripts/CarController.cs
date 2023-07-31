@@ -18,7 +18,8 @@ public class CarController : MonoBehaviour
     private float verticalInput;
     private float currentSpeed;
 
-    public float deathZone = -10f; 
+    public float deathZone = -10f;
+    public Transform endZone;
     public Vector3 startingPosition;
 
     private AudioSource audioSource;
@@ -42,12 +43,18 @@ public class CarController : MonoBehaviour
             Honk();
         }
 
-        // Check if the car falls below the Y-coordinate threshold
+        // Check if the car falls below the death zone
         if (transform.position.y < deathZone)
         {
             RespawnCar();
         }
 
+        // Check if the car reaches the end of the road
+        if (Vector3.Distance(transform.position, endZone.position) <5f)
+        {
+            RespawnCar();
+        }
+        
         // Check for handbrake input
         if (Input.GetKey(KeyCode.Space))
         {
@@ -127,7 +134,7 @@ public class CarController : MonoBehaviour
         transform.rotation = Quaternion.identity;
 
         // Reset the current speed to zero
-        currentSpeed = 0f;
+        currentSpeed = 25f;
     }
 }
 
