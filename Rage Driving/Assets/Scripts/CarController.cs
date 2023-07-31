@@ -10,6 +10,7 @@ public class CarController : MonoBehaviour
     public float rotationSpeed = 100f;
     public float acceleration = 10f;                       
     public float deceleration = 10f;
+    public float handbrakeDeceleration = 20f;
 
     public AudioClip honkSound;
 
@@ -21,6 +22,8 @@ public class CarController : MonoBehaviour
     public Vector3 startingPosition;
 
     private AudioSource audioSource;
+
+    private bool isHandbrakeActive = false;
 
     private void Awake()
     {
@@ -44,6 +47,16 @@ public class CarController : MonoBehaviour
         {
             RespawnCar();
         }
+
+        // Check for handbrake input
+        if (Input.GetKey(KeyCode.Space))
+        {
+            isHandbrakeActive = true;
+        }
+        else
+        {
+            isHandbrakeActive = false;
+        }
     }
 
     private void FixedUpdate()
@@ -57,14 +70,24 @@ public class CarController : MonoBehaviour
         // Car's forward movement
         Vector3 movement = transform.forward * verticalInput * acceleration * Time.fixedDeltaTime;
 
+        if (isHandbrakeActive)
+        {
+            // Apply handbrake deceleration
+            float handbrakeDecelerationAmount = handbrakeDeceleration * Time.fixedDeltaTime;
+            float speedSign = Mathf.Sign(currentSpeed);
+            currentSpeed = Mathf.Clamp(Mathf.Abs(currentSpeed) - handbrakeDecelerationAmount, 0f, maxSpeed) * speedSign;
+            movement = transform.forward * currentSpeed * Time.fixedDeltaTime;
+        }
+
         // Deceleration when not accelerating
-        if (Mathf.Approximately(verticalInput, 0f))
+        else if (Mathf.Approximately(verticalInput, 0f))
         {
             float decelerationAmount = deceleration * Time.fixedDeltaTime;
             float speedSign = Mathf.Sign(currentSpeed);
             currentSpeed = Mathf.Clamp(Mathf.Abs(currentSpeed) - decelerationAmount, 0f, maxSpeed) * speedSign;
             movement = transform.forward * currentSpeed * Time.fixedDeltaTime;
         }
+
         else
         {
             // Accelerate the car and cap the speed at the maxSpeed
