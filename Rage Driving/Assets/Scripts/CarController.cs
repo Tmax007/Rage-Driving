@@ -10,6 +10,7 @@ public class CarController : MonoBehaviour
     public float rotationSpeed = 100f;
     public float acceleration = 10f;                       
     public float deceleration = 10f;
+    public float handbrakeDeceleration = 20f;
 
     public AudioClip honkSound;
 
@@ -17,10 +18,21 @@ public class CarController : MonoBehaviour
     private float verticalInput;
     private float currentSpeed;
 
-    public float deathZone = -10f; 
+    public float deathZone = -10f;
+    public Transform endZone;
     public Vector3 startingPosition;
 
     private AudioSource audioSource;
+
+    private bool isHandbrakeActive = false;
+
+    [Header("Motorcycle Settings")]
+    public GameObject motorcyclePrefab;     
+    public float minSpawnInterval = 10f;   
+    public float maxSpawnInterval = 30f;    
+
+    private bool isMotorcycleSpawning = false;
+    private float nextSpawnTime;
 
     private void Awake()
     {
@@ -39,11 +51,34 @@ public class CarController : MonoBehaviour
             Honk();
         }
 
-        // Check if the car falls below the Y-coordinate threshold
+        // Check if the car falls below the death zone
         if (transform.position.y < deathZone)
         {
             RespawnCar();
         }
+
+        // Check if the car reaches the end of the road
+        if (Vector3.Distance(transform.position, endZone.position) <5f)
+        {
+            RespawnCar();
+        }
+        
+        // Check for handbrake input
+        if (Input.GetKey(KeyCode.Space))
+        {
+            isHandbrakeActive = true;
+        }
+        else
+        {
+            isHandbrakeActive = false;
+        }
+
+        // Check if a motorcycle is not currently spawning and if it's time to spawn one
+        if (!isMotorcycleSpawning && Time.time >= nextSpawnTime)
+        {
+            SpawnMotorcycle();
+        }
+
     }
 
     private void FixedUpdate()
@@ -57,14 +92,24 @@ public class CarController : MonoBehaviour
         // Car's forward movement
         Vector3 movement = transform.forward * verticalInput * acceleration * Time.fixedDeltaTime;
 
+        if (isHandbrakeActive)
+        {
+            // Apply handbrake deceleration
+            float handbrakeDecelerationAmount = handbrakeDeceleration * Time.fixedDeltaTime;
+            float speedSign = Mathf.Sign(currentSpeed);
+            currentSpeed = Mathf.Clamp(Mathf.Abs(currentSpeed) - handbrakeDecelerationAmount, 0f, maxSpeed) * speedSign;
+            movement = transform.forward * currentSpeed * Time.fixedDeltaTime;
+        }
+
         // Deceleration when not accelerating
-        if (Mathf.Approximately(verticalInput, 0f))
+        else if (Mathf.Approximately(verticalInput, 0f))
         {
             float decelerationAmount = deceleration * Time.fixedDeltaTime;
             float speedSign = Mathf.Sign(currentSpeed);
             currentSpeed = Mathf.Clamp(Mathf.Abs(currentSpeed) - decelerationAmount, 0f, maxSpeed) * speedSign;
             movement = transform.forward * currentSpeed * Time.fixedDeltaTime;
         }
+
         else
         {
             // Accelerate the car and cap the speed at the maxSpeed
@@ -104,8 +149,26 @@ public class CarController : MonoBehaviour
         transform.rotation = Quaternion.identity;
 
         // Reset the current speed to zero
-        currentSpeed = 0f;
+        currentSpeed = 25f;
     }
+
+    private void SpawnMotorcycle()
+    {
+        // Spawn the motorcycle at the back of the car
+        Vector3 spawnPosition = transform.position - (transform.forward * 3f);
+        GameObject motorcycle = Instantiate(motorcyclePrefab, spawnPosition, Quaternion.identity);
+
+        // Get the AnimationController script from the "AnimationHolder" GameObject
+        AnimController animationController = GameObject.Find("AnimationHolder").GetComponent<AnimController>();
+
+        // Start the motorcycle movement animation
+        animationController.PlayAnimRandomly();
+
+        // Randomly choose the next interval to spawn the motorcycle
+        float spawnInterval = Random.Range(minSpawnInterval, maxSpawnInterval);
+        nextSpawnTime = Time.time + spawnInterval;
+    }
+
 }
 
 
