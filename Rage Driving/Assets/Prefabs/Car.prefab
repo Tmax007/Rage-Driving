@@ -216,7 +216,7 @@ GameObject:
   - component: {fileID: 2808239343145931267}
   m_Layer: 0
   m_Name: Car
-  m_TagString: Untagged
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -383,9 +383,14 @@ MonoBehaviour:
   rotationSpeed: 100
   acceleration: 10
   deceleration: 10
+  handbrakeDeceleration: 20
   honkSound: {fileID: 8300000, guid: 10f67ddcdaeb1b744ad7895db2e33780, type: 3}
   deathZone: -10
+  endZone: {fileID: 0}
   startingPosition: {x: 0, y: 0, z: 3}
+  motorcyclePrefab: {fileID: 0}
+  minSpawnInterval: 10
+  maxSpawnInterval: 30
 --- !u!1 &3420831675738377669
 GameObject:
   m_ObjectHideFlags: 0

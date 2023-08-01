@@ -26,6 +26,14 @@ public class CarController : MonoBehaviour
 
     private bool isHandbrakeActive = false;
 
+    [Header("Motorcycle Settings")]
+    public GameObject motorcyclePrefab;     
+    public float minSpawnInterval = 10f;   
+    public float maxSpawnInterval = 30f;    
+
+    private bool isMotorcycleSpawning = false;
+    private float nextSpawnTime;
+
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -64,6 +72,13 @@ public class CarController : MonoBehaviour
         {
             isHandbrakeActive = false;
         }
+
+        // Check if a motorcycle is not currently spawning and if it's time to spawn one
+        if (!isMotorcycleSpawning && Time.time >= nextSpawnTime)
+        {
+            SpawnMotorcycle();
+        }
+
     }
 
     private void FixedUpdate()
@@ -136,6 +151,24 @@ public class CarController : MonoBehaviour
         // Reset the current speed to zero
         currentSpeed = 25f;
     }
+
+    private void SpawnMotorcycle()
+    {
+        // Spawn the motorcycle at the back of the car
+        Vector3 spawnPosition = transform.position - (transform.forward * 3f);
+        GameObject motorcycle = Instantiate(motorcyclePrefab, spawnPosition, Quaternion.identity);
+
+        // Get the AnimationController script from the "AnimationHolder" GameObject
+        AnimController animationController = GameObject.Find("AnimationHolder").GetComponent<AnimController>();
+
+        // Start the motorcycle movement animation
+        animationController.PlayAnimRandomly();
+
+        // Randomly choose the next interval to spawn the motorcycle
+        float spawnInterval = Random.Range(minSpawnInterval, maxSpawnInterval);
+        nextSpawnTime = Time.time + spawnInterval;
+    }
+
 }
 
 
